@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="shortcut icon" href="#">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/gh/alpinejs/alpine@v2.x.x/dist/alpine.js" defer></script>
+    <!-- <script src="https://unpkg.com/tailwindcss-jit-cdn"></script> -->
+    <link href="https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css" rel="stylesheet">
+    <title>Document</title>
+</head>
+<body>
+    <!-- Calculator -->
+    <div class="p-2 pb-6 mb-4 text-center" x-data="{first: 0, second: 0}">
+        <h2 class="mb-3 text-red-500 font-bold">Calculator</h2>
+        <input type="text" x-model.number="first" class="p-2 rounded border"> + <input type="text" x-model.number="second" class="p-2 rounded border"> = <output
+            x-text="first + second"></output>
+    </div>
+
+    <!-- Toggle visibility using state -->
+    <div class="p-2 pb-6 mb-4 text-center bg-gray-200">
+        <h2 class="mb-3 text-red-500 font-bold">Toggle visibility</h2>
+        <div x-data="{ currentTab: 'first'}" class="text-center">
+            <button @click="currentTab = 'first'" class="p-2 border focus:outline-none rounded" :class="currentTab === 'first' ? 'bg-gray-400' : '' ">First</button>
+            <button @click="currentTab = 'second'" class="p-2 border focus:outline-none rounded" :class="currentTab === 'second' ? 'bg-gray-400' : '' ">Second</button>
+            <button @click="currentTab = 'third'" class="p-2 border focus:outline-none rounded" :class="currentTab === 'third' ? 'bg-gray-400' : '' ">Third</button>
+            <div x-show="currentTab === 'first'" class="mt-2">
+                <p>Alpine does not require you to store all logic as HTML attribute values.</p>
+            </div>
+            <div x-show="currentTab === 'second'" class="mt-2">
+                <p>When necessary, you can easily reference a global function that returns an object.</p>
+            </div>
+            <div x-show="currentTab === 'third'" class="mt-2">
+                <p>Here, you can declare your component's data and behavior separately from the HTML.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Two way Data binding -->
+    <div class="p-2 pb-6 mb-4 text-center">
+        <h2 class="mb-3 text-red-500 font-bold">2 Way Binding with fetch API</h2>
+        <div class="max-w-md mx-auto">
+            <label for="name" class="block mb-2 font-bold text-sm text-gray-700">Name:</label>
+            <form action="#" method="post"
+                x-data="{
+                    form: {
+                        name: ''
+                    },
+
+                    user: null,
+
+                    submit() {
+                        fetch('https://reqres.in/api/users', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(this.form)
+                        })
+                        .then(response => response.json())
+                        .then(user => this.user = user);
+                    }
+                }"
+                @submit.prevent="submit"
+            >
+                <input type="text" name="name"
+                    class="border border-gray-400 p-2 w-full rounded"
+                    x-model="form.name"
+                >
+
+                <template x-if="user">
+                    <div x-text="'The user ' + user.name + ' was created at ' + user.createdAt"></div>
+                </template>
+            </form>
+
+        </div>
+    </div>
+
+    <!-- Component -->
+    <div class="p-2 pb-6 mb-4 bg-gray-200">
+        <h2 class="mb-3 text-red-500 font-bold text-center">Todo Component</h2>
+        <div class="max-w-md mx-auto">
+            <div
+                x-data="taskApp()"
+            >
+                <form action="#" method="post"
+                    @submit.prevent="submit"
+                >
+                    <input
+                        type="text"
+                        x-model="newTask"
+                        class="border border-gray-400 p-2 w-full rounded"
+                    >
+                </form>
+                <ul class="list-disc px-4 py-2">
+                    <template x-for="(task, index) in tasks" :key="index">
+                        <li>
+                            <input type="checkbox" x-model="task.completed">
+                            <span x-text="task.body" :class="{ 'line-through' : task.completed }"></span>
+                        </li>
+                    </template>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Transitions -->
+    <div class="p-2 pb-6 h-full">
+        <h2 class="mb-3 text-red-500 font-bold text-center">Transitions</h2>
+        <div class="max-w-md mx-auto">
+            <div class="text-center"
+                x-data="{ show: true }"
+            >
+                <button @click="show = ! show" class="border p-2 bg-gray-400 rounded focus:outline-none">Expend Links</button>
+                <div class="bg-black rounded py-2 mt-1 w-28 h-20 mx-auto"
+                    x-show="show"
+                    x-transition:enter="transition duration-300 transform"
+                    x-transition:enter-start="scale-75"
+                    x-transition:leave="transition duration-200 transform"
+                    x-transition:leave-end="opacity-0 scale-90"
+                >
+                    <a href="#" class="text-white px-4 text-sm hover:bg-gray-800 block">Delete</a>
+                    <a href="#" class="text-white px-4 text-sm hover:bg-gray-800 block">Edit</a>
+                    <a href="#" class="text-white px-4 text-sm hover:bg-gray-800 block">Report Spam</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom Events -->
+    <div class="h-full flex justify-center items-center pb-4 bg-gray-200">
+        <div class="w-1/3">
+            <h2 class="p-2 text-red-500 font-bold text-center">Handling Custom Events</h2>
+            <div
+                x-data
+                class="p-2 text-center"
+            >
+                <button
+                    @click="$dispatch('flash', 'Hello There!')"
+                    class="border rounded bg-gray-400 p-2 focus:outline-none"
+                >Trigger new Event</button>
+            </div>
+        </div>
+    </div>
+    <div
+        x-data="{
+                show: false,
+                message: ''
+            }
+        "
+        x-show="show"
+        @flash.window="
+            show = ! show;
+            message = $event.detail;
+        "
+        x-text="message"
+        class="fixed bottom-0 right-0 mb-4 mr-4 bg-green-500 text-white p-2 rounded"
+
+    ></div>
+
+
+
+    <script>
+        // Component
+        let taskApp = () => {
+            return {
+                tasks: [],
+
+                newTask: '',
+
+                submit() {
+                    this.tasks.push({ body: this.newTask, completed: false });
+
+                    this.newTask = '';
+                }
+            }
+        }
+    </script>
+
+    <script>
+        // Custom Events
+        window.flash = message => window.dispatchEvent(new CustomEvent('flash', { detail: message }));
+    </script>
+</body>
+</html>
